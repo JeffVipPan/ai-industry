@@ -7,6 +7,8 @@ import { timelineEvents } from '../data/timeline';
 import { valueFlowScenarios } from '../data/value-flows';
 import { useAppStore } from '../store/useAppStore';
 import { DemoDataNotice } from '../components/DemoDataNotice';
+import { HowToReadDialog } from '../components/HowToReadDialog';
+import { ReadingHint } from '../components/ReadingHint';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { SankeyDiagram } from '../components/SankeyDiagram';
@@ -181,6 +183,7 @@ export const HomePage = () => {
               <BookOpen className="h-4 w-4" />
               研究文档
             </Link>
+            <HowToReadDialog />
           </div>
           <Link
             to={chapters[0].href}
@@ -201,6 +204,7 @@ export const HomePage = () => {
           <div>
             <Badge>章节式探索</Badge>
             <h2 className="mt-4 max-w-3xl text-3xl font-semibold leading-tight text-white sm:text-5xl">先理解产业链，再进入节点。</h2>
+            <ReadingHint className="mt-4">先读 3 个章节，建立 AI 产业链的主线判断。</ReadingHint>
           </div>
           <DemoDataNotice compact />
         </div>
@@ -226,6 +230,7 @@ export const HomePage = () => {
           <p className="mt-5 text-base leading-8 text-slate-400">
             详情页会把信息整理为核心结论、关键指标、上下游关系、相关公司和下一步阅读。它不是炫技的图，而是可以稳定阅读和复用的知识结构。
           </p>
+          <ReadingHint className="mt-5">每个详情页都按同一套结构组织，方便横向比较产业层。</ReadingHint>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {['核心结论', '关键指标', '上下游关系', '相关公司'].map((item, index) => (
               <div
@@ -248,6 +253,7 @@ export const HomePage = () => {
           <div>
             <Badge>L2 产业层</Badge>
             <h2 className="mt-4 text-3xl font-semibold leading-tight text-white sm:text-5xl">从能源到具身智能的价值链</h2>
+            <ReadingHint className="mt-4">这里是完整产业链目录，适合直接跳到某一层深入。</ReadingHint>
           </div>
           <Link to="/map" className="inline-flex items-center gap-2 text-sm font-medium text-cyan-200">
             打开完整图谱
@@ -262,6 +268,9 @@ export const HomePage = () => {
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-8 px-4 pb-24 pt-10 lg:grid-cols-[1.18fr_.82fr]">
+        <div className="lg:col-span-2">
+          <ReadingHint>价值流看收入和利润怎么分配，时间线看技术与资本事件。</ReadingHint>
+        </div>
         <div className="min-w-0">
           <div className="mb-4 flex items-center justify-between">
             <div>
