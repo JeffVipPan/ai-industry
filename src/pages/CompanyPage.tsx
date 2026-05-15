@@ -50,8 +50,16 @@ export const CompanyPage = () => {
         <ArrowLeft className="h-4 w-4" />
         返回关系图
       </Link>
-      <section className="grid gap-8 lg:grid-cols-[1fr_380px]">
-        <div>
+      <section className="grid gap-8 lg:grid-cols-[180px_minmax(0,1fr)_260px]">
+        <nav className="hidden border-r border-slate-700/20 pr-5 text-sm leading-8 text-slate-400 lg:block">
+          <p className="mb-3 text-xs font-medium text-slate-500">研究文档</p>
+          <a href="#summary" className="block font-semibold text-cyan-200">核心结论</a>
+          <a href="#metrics" className="block">关键指标</a>
+          <a href="#business" className="block">AI 业务</a>
+          <a href="#relationships" className="block">上下游关系</a>
+          <a href="#financials" className="block">财务趋势</a>
+        </nav>
+        <article className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <Badge>L3 公司详情</Badge>
             {layers.map((layer) => (
@@ -61,29 +69,54 @@ export const CompanyPage = () => {
             ))}
           </div>
           <div className="mt-5 flex items-center gap-5">
-            <div className="grid h-20 w-20 place-items-center rounded-lg border border-cyan-300/25 bg-cyan-300/8 font-mono text-lg text-cyan-100 shadow-glow">
+            <div className="grid h-20 w-20 place-items-center rounded-2xl border border-slate-700/20 bg-white font-mono text-lg text-cyan-100 shadow-glow">
               {company.logo}
             </div>
             <div>
-              <h1 className="text-4xl font-light text-white sm:text-6xl">{company.name.en}</h1>
+              <h1 className="text-4xl font-semibold leading-tight text-white sm:text-6xl">{company.name.en}</h1>
               <p className="mt-2 text-slate-400">{company.name.zh} · {company.basicInfo.country} · {companyTypeLabel[company.basicInfo.type]}</p>
             </div>
           </div>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">{company.aiBusiness.strategicPosition.zh}</p>
-        </div>
-        <div className="glass-panel rounded-lg p-5">
-          <DemoDataNotice />
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <MetricCard label={company.basicInfo.type === 'private' ? '估值' : '市值'} value={`${formatCurrency(marketCap, currency)} demo`} />
-            <MetricCard label="AI 收入占比" value={`${Math.round(company.aiBusiness.aiRevenueShare * 100)}%`} />
-            <MetricCard label="市盈率" value={String(company.publicMetrics?.pe ?? 'N/A')} />
-            <MetricCard label="毛利率" value={typeof company.publicMetrics?.grossMargin === 'number' ? `${Math.round(company.publicMetrics.grossMargin * 100)}%` : 'N/A'} />
+          <section id="summary" className="document-prose research-blue-surface mt-8 rounded-2xl border border-slate-700/20 p-6 shadow-[0_18px_55px_rgba(0,0,0,0.045)]">
+            <p className="text-sm font-semibold text-cyan-200">核心结论</p>
+            <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-300">{company.aiBusiness.strategicPosition.zh}</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {company.aiBusiness.coreProducts.slice(0, 4).map((item) => (
+                <Badge key={item}>{item}</Badge>
+              ))}
+            </div>
+          </section>
+        </article>
+        <aside className="glass-panel h-fit rounded-2xl p-5">
+          <p className="text-sm font-semibold text-white">On this page</p>
+          <div className="mt-4 space-y-2 text-sm text-slate-400">
+            <a href="#summary" className="block text-cyan-200">摘要</a>
+            <a href="#metrics" className="block">指标</a>
+            <a href="#business" className="block">AI 业务</a>
+            <a href="#relationships" className="block">关系图</a>
+            <a href="#financials" className="block">财务趋势</a>
           </div>
-        </div>
+          <div className="mt-5 border-t border-slate-700/20 pt-4">
+            <DemoDataNotice />
+          </div>
+        </aside>
       </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1fr_.85fr]">
-        <div className="glass-panel rounded-lg p-5">
+      <section id="metrics" className="mt-8 grid gap-4 lg:ml-[212px] lg:grid-cols-4">
+        <MetricCard label={company.basicInfo.type === 'private' ? '估值' : '市值'} value={`${formatCurrency(marketCap, currency)} demo`} />
+        <MetricCard label="AI 收入占比" value={`${Math.round(company.aiBusiness.aiRevenueShare * 100)}%`} />
+        <MetricCard label="市盈率" value={String(company.publicMetrics?.pe ?? 'N/A')} />
+        <MetricCard label="毛利率" value={typeof company.publicMetrics?.grossMargin === 'number' ? `${Math.round(company.publicMetrics.grossMargin * 100)}%` : 'N/A'} />
+      </section>
+
+      <div className="mt-6 hidden lg:ml-[212px] lg:block">
+        <div className="glass-panel rounded-2xl p-5">
+          <DemoDataNotice />
+        </div>
+      </div>
+
+      <section id="business" className="mt-10 grid gap-6 lg:grid-cols-[1fr_.85fr]">
+        <div className="glass-panel rounded-2xl p-5">
           <h2 className="text-xl font-semibold text-white">AI 业务分析</h2>
           <div className="mt-5 grid gap-5 md:grid-cols-3">
             <div>
@@ -98,7 +131,7 @@ export const CompanyPage = () => {
               <p className="mb-2 text-sm text-slate-500">护城河</p>
               <div className="space-y-2">
                 {company.aiBusiness.moats.map((moat) => (
-                  <div key={moat.type} className="rounded-md bg-slate-950/35 p-2 text-sm text-slate-300">
+                  <div key={moat.type} className="rounded-lg bg-slate-950/35 p-3 text-sm text-slate-300">
                     <strong className="text-cyan-100">{moat.type}</strong>
                     <p className="mt-1 text-xs leading-5 text-slate-500">{moat.description}</p>
                   </div>
@@ -109,7 +142,7 @@ export const CompanyPage = () => {
               <p className="mb-2 text-sm text-slate-500">风险</p>
               <div className="space-y-2">
                 {company.aiBusiness.risks.map((risk) => (
-                  <div key={risk.type} className="rounded-md bg-slate-950/35 p-2 text-sm text-slate-300">
+                  <div key={risk.type} className="rounded-lg bg-slate-950/35 p-3 text-sm text-slate-300">
                     <strong className="text-violet-200">{risk.type}</strong>
                     <p className="mt-1 text-xs leading-5 text-slate-500">{risk.description}</p>
                   </div>
@@ -118,7 +151,7 @@ export const CompanyPage = () => {
             </div>
           </div>
         </div>
-        <div className="glass-panel rounded-lg p-5">
+        <div className="glass-panel rounded-2xl p-5">
           <h2 className="text-xl font-semibold text-white">基础信息</h2>
           <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
             {[
@@ -129,7 +162,7 @@ export const CompanyPage = () => {
               ['总部', company.basicInfo.headquarters],
               ['母公司', company.basicInfo.parentCompanyId ?? 'N/A'],
             ].map(([label, value]) => (
-              <div key={String(label)} className="rounded-md bg-slate-950/35 p-3">
+              <div key={String(label)} className="rounded-lg bg-slate-950/35 p-3">
                 <dt className="text-xs text-slate-500">{label}</dt>
                 <dd className="mt-1 text-slate-200">{value}</dd>
               </div>
@@ -138,8 +171,8 @@ export const CompanyPage = () => {
         </div>
       </section>
 
-      <section className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
-        <div className="glass-panel rounded-lg p-5">
+      <section id="relationships" className="mt-10 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+        <div className="glass-panel rounded-2xl p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-semibold text-white">上下游关系</h2>
@@ -149,11 +182,11 @@ export const CompanyPage = () => {
           </div>
           <RelationshipGraph target={{ type: 'company', id: company.id }} dense />
         </div>
-        <div className="glass-panel rounded-lg p-5">
+        <div className="glass-panel rounded-2xl p-5">
           <h2 className="text-xl font-semibold text-white">相关节点</h2>
           <div className="mt-5 space-y-3">
             {relatedCompanies.slice(0, 12).map((related) => (
-              <Link key={related.id} to={`/companies/${related.id}`} className="flex items-center gap-3 rounded-md border border-slate-700/35 bg-slate-950/35 p-3 transition hover:border-cyan-300/35">
+              <Link key={related.id} to={`/companies/${related.id}`} className="flex items-center gap-3 rounded-lg border border-slate-700/35 bg-white p-3 transition hover:border-slate-400">
                 <span className="grid h-9 w-9 place-items-center rounded bg-cyan-300/8 font-mono text-[10px] text-cyan-100">{related.logo}</span>
                 <span>
                   <span className="block text-sm text-slate-100">{related.name.en}</span>
@@ -166,7 +199,7 @@ export const CompanyPage = () => {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section id="financials" className="mt-10">
         <FinancialChart companyId={company.id} />
       </section>
     </div>

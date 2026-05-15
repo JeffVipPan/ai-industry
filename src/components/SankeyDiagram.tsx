@@ -21,9 +21,9 @@ type SankeyLink = {
 };
 
 const colorByCategory: Record<string, string> = {
-  'revenue-source': '#67e8f9',
-  intermediate: '#60a5fa',
-  'final-beneficiary': '#a78bfa',
+  'revenue-source': '#0071e3',
+  intermediate: '#34c759',
+  'final-beneficiary': '#ff9f0a',
 };
 
 export const SankeyDiagram = ({ scenario }: { scenario: ValueFlowScenario }) => {
@@ -47,12 +47,13 @@ export const SankeyDiagram = ({ scenario }: { scenario: ValueFlowScenario }) => 
   }, [scenario]);
 
   return (
-    <div className="w-full max-w-full overflow-x-auto rounded-lg border border-slate-700/30 bg-slate-950/35 p-3">
+    <div className="w-full max-w-full overflow-x-auto rounded-2xl border border-slate-700/20 bg-white p-3 shadow-[0_18px_55px_rgba(0,0,0,0.045)]">
       <svg viewBox="0 0 880 440" className="min-h-[360px] min-w-[820px]">
         <defs>
           <linearGradient id="flowGradient" x1="0%" x2="100%" y1="0%" y2="0%">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.34" />
+            <stop offset="0%" stopColor="#0071e3" stopOpacity="0.18" />
+            <stop offset="52%" stopColor="#34c759" stopOpacity="0.16" />
+            <stop offset="100%" stopColor="#ff9f0a" stopOpacity="0.2" />
           </linearGradient>
         </defs>
         {graph.links.map((link, index) => (
@@ -62,7 +63,7 @@ export const SankeyDiagram = ({ scenario }: { scenario: ValueFlowScenario }) => 
             fill="none"
             stroke="url(#flowGradient)"
             strokeWidth={Math.max(1, link.width ?? 1)}
-            strokeOpacity={0.72}
+            strokeOpacity={0.85}
           />
         ))}
         {graph.nodes.map((node) => (
@@ -74,9 +75,9 @@ export const SankeyDiagram = ({ scenario }: { scenario: ValueFlowScenario }) => 
               height={(node.y1 ?? 0) - (node.y0 ?? 0)}
               rx={4}
               fill={colorByCategory[node.category]}
-              opacity={scenario.bottlenecks.includes(node.id) ? 0.92 : 0.72}
+              opacity={scenario.bottlenecks.includes(node.id) ? 0.9 : 0.62}
             />
-            <text x={(node.x1 ?? 0) + 8} y={((node.y0 ?? 0) + (node.y1 ?? 0)) / 2} dominantBaseline="middle" fill="#e2e8f0" fontSize={12}>
+            <text x={(node.x1 ?? 0) + 8} y={((node.y0 ?? 0) + (node.y1 ?? 0)) / 2} dominantBaseline="middle" fill="#3a3a3c" fontSize={12}>
               {node.name}
             </text>
           </g>

@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
-import { NodeUniverse } from './components/NodeUniverse';
 import { CompanyPage } from './pages/CompanyPage';
 import { HomePage } from './pages/HomePage';
 import { LayerPage } from './pages/LayerPage';
@@ -23,7 +22,6 @@ export const AppRoutes = () => (
 
 const App = () => (
   <BrowserRouter>
-    <NodeUniverse />
     <AppShell>
       <AppRoutes />
     </AppShell>

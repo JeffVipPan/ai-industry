@@ -40,6 +40,7 @@ export const timelineCategoryLabel: Record<TimelineCategory | 'all', string> = {
   infra: '基础设施',
   application: '应用',
   capital: '资本',
+  policy: '政策',
 };
 
 export const relationshipTypeLabel: Record<RelationshipType, string> = {

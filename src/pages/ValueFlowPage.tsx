@@ -13,7 +13,7 @@ export const ValueFlowPage = () => {
       <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <Badge>L2 价值流动</Badge>
-          <h1 className="mt-4 text-4xl font-light text-white sm:text-6xl">收入和利润流向哪里</h1>
+          <h1 className="mt-4 text-4xl font-semibold leading-tight text-white sm:text-6xl">收入和利润流向哪里</h1>
           <p className="mt-4 max-w-2xl text-slate-400">以 Sankey Diagram 展示收入流、成本流、资本开支流和关键利润池。</p>
         </div>
         <DemoDataNotice />
@@ -24,7 +24,7 @@ export const ValueFlowPage = () => {
             key={item.id}
             onClick={() => setScenarioId(item.id)}
             className={`min-h-11 min-w-fit rounded-md border px-3 text-sm transition ${
-              item.id === scenario.id ? 'border-cyan-300/40 bg-cyan-300/10 text-cyan-100' : 'border-slate-700/35 bg-slate-950/45 text-slate-400 hover:text-white'
+              item.id === scenario.id ? 'border-slate-950 bg-slate-950 text-[#fbfbfd]' : 'border-slate-700/35 bg-white text-slate-400 hover:text-white'
             }`}
           >
             {item.title.zh}
@@ -35,7 +35,7 @@ export const ValueFlowPage = () => {
         <div className="min-w-0">
           <SankeyDiagram scenario={scenario} />
         </div>
-        <aside className="glass-panel rounded-lg p-5">
+        <aside className="glass-panel rounded-2xl p-5">
           <h2 className="text-xl font-semibold text-white">{scenario.title.zh}</h2>
           <p className="mt-4 text-sm leading-6 text-slate-400">{scenario.description.zh}</p>
           <div className="mt-6">

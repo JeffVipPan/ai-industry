@@ -6,7 +6,7 @@ export const FinancialChart = ({ companyId }: { companyId: string }) => {
   const data = financialHistory[companyId] ?? [];
 
   return (
-    <div className="glass-panel rounded-lg p-4">
+    <div className="glass-panel rounded-2xl p-4">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs text-slate-500">财务趋势（示意）</p>
@@ -19,26 +19,27 @@ export const FinancialChart = ({ companyId }: { companyId: string }) => {
           <AreaChart data={data}>
             <defs>
               <linearGradient id="revenue" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.35} />
-                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
+                <stop offset="5%" stopColor="#0071e3" stopOpacity={0.18} />
+                <stop offset="95%" stopColor="#0071e3" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="aiRevenue" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#34c759" stopOpacity={0.18} />
+                <stop offset="95%" stopColor="#34c759" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid stroke="rgba(148,163,184,.12)" />
-            <XAxis dataKey="year" stroke="#64748b" />
-            <YAxis stroke="#64748b" />
+            <CartesianGrid stroke="rgba(210,210,215,.8)" />
+            <XAxis dataKey="year" stroke="#86868b" />
+            <YAxis stroke="#86868b" />
             <Tooltip
               contentStyle={{
-                background: 'rgba(2,6,23,.92)',
-                border: '1px solid rgba(34,211,238,.22)',
+                background: '#ffffff',
+                border: '1px solid rgba(210,210,215,.95)',
                 borderRadius: 8,
+                color: '#1d1d1f',
               }}
             />
-            <Area dataKey="revenue" stroke="#22d3ee" fill="url(#revenue)" name="营收（示意）" />
-            <Area dataKey="aiRevenue" stroke="#8b5cf6" fill="url(#aiRevenue)" name="AI 收入（示意）" />
+            <Area dataKey="revenue" stroke="#0071e3" fill="url(#revenue)" name="营收（示意）" />
+            <Area dataKey="aiRevenue" stroke="#34c759" fill="url(#aiRevenue)" name="AI 收入（示意）" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

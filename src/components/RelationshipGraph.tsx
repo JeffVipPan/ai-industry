@@ -37,9 +37,11 @@ export const RelationshipGraph = ({ target, dense = false }: { target?: EntityRe
           y: isTarget ? 240 : 240 + Math.sin(angle) * radius * 0.65,
         },
         style: {
-          borderColor: isTarget ? '#22d3ee' : 'rgba(148,163,184,0.25)',
-          boxShadow: isTarget ? '0 0 24px rgba(34,211,238,.32)' : undefined,
-          background: ref.type === 'layer' ? `${layer?.visualIdentity.color}1A` : 'rgba(2,6,23,.86)',
+          borderColor: isTarget ? '#0071e3' : 'rgba(210,210,215,0.95)',
+          borderRadius: 999,
+          boxShadow: isTarget ? '0 16px 36px rgba(0,0,0,.12)' : '0 10px 24px rgba(0,0,0,.06)',
+          background: ref.type === 'layer' ? `${layer?.visualIdentity.color}18` : '#ffffff',
+          color: '#1d1d1f',
         },
       };
     });
@@ -49,17 +51,17 @@ export const RelationshipGraph = ({ target, dense = false }: { target?: EntityRe
       source: `${relationship.from.type}:${relationship.from.id}`,
       target: `${relationship.to.type}:${relationship.to.id}`,
       label: relationshipTypeLabel[relationship.type],
-      animated: relationship.strength >= 4,
-      style: { strokeWidth: 1 + relationship.strength / 2 },
+      animated: false,
+      style: { strokeWidth: 1 + relationship.strength / 2, stroke: relationship.strength >= 4 ? '#0071e3' : 'rgba(110,110,115,.42)' },
     }));
 
     return { nodes: graphNodes, edges: graphEdges };
   }, [dense, target]);
 
   return (
-    <div className="h-[420px] overflow-hidden rounded-lg border border-slate-700/30 bg-slate-950/35">
+    <div className="h-[420px] overflow-hidden rounded-2xl border border-slate-700/20 bg-white">
       <ReactFlow nodes={nodes} edges={edges} fitView proOptions={{ hideAttribution: true }}>
-        <Background color="rgba(34,211,238,.18)" gap={24} />
+        <Background color="rgba(110,110,115,.16)" gap={28} />
         <Controls showInteractive={false} />
       </ReactFlow>
     </div>
