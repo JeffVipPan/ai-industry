@@ -59,7 +59,7 @@ export const TimelinePage = () => {
         ))}
       </div>
 
-      <div className="relative mx-auto max-w-5xl pb-8">
+      <div className="relative max-w-5xl pb-8">
         <div className="absolute bottom-0 left-4 top-0 w-px bg-gradient-to-b from-[#8ec5ff] via-slate-700/20 to-transparent md:left-36" />
         <div className="space-y-5">
           {events.map((event) => (
@@ -69,7 +69,7 @@ export const TimelinePage = () => {
               className="relative grid gap-4 pl-10 md:grid-cols-[8rem_minmax(0,1fr)] md:gap-8 md:pl-0"
             >
               <span className="absolute left-[0.8rem] top-7 h-4 w-4 rounded-full border-4 border-white shadow-glow md:left-[8.5rem]" style={{ backgroundColor: event.visualIdentity.color }} />
-              <div className="pt-1 md:pt-5 md:text-right">
+              <div className="pt-1 md:pt-5 md:text-left">
                 <p className="font-mono text-3xl text-cyan-100">{formatEventDate(event.year, event.month)}</p>
                 <p className="mt-1 text-xs text-slate-500">{regionLabel[event.region]} · {timelineCategoryLabel[event.category]}</p>
               </div>

@@ -62,4 +62,21 @@ test('timeline stacks events vertically without horizontal overflow', async ({ p
   expect(cardPositions.length).toBeGreaterThanOrEqual(3);
   expect(cardPositions[1].y).toBeGreaterThan(cardPositions[0].y + 40);
   expect(cardPositions[2].y).toBeGreaterThan(cardPositions[1].y + 40);
+
+  const alignment = await page.evaluate(() => {
+    const heading = document.querySelector('h1');
+    const firstDate = document.querySelector('[data-testid="timeline-event"] p');
+    if (!heading || !firstDate || !firstDate.firstChild) return null;
+
+    const dateRange = document.createRange();
+    dateRange.selectNodeContents(firstDate.firstChild);
+
+    return {
+      dateTextX: dateRange.getBoundingClientRect().x,
+      headingX: heading.getBoundingClientRect().x,
+    };
+  });
+
+  expect(alignment).not.toBeNull();
+  expect(Math.abs((alignment?.dateTextX ?? 0) - (alignment?.headingX ?? 0))).toBeLessThanOrEqual(4);
 });
