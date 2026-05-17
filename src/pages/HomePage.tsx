@@ -56,20 +56,20 @@ export const HomePage = () => {
 
   return (
     <div className="relative z-10">
-      <section className="research-hero-surface flex min-h-[78vh] flex-col justify-center border-b border-slate-700/20 px-4 pb-16 pt-28">
+      <section className="research-hero-surface flex min-h-[calc(100svh-8rem)] flex-col justify-center border-b border-slate-700/20 px-4 pb-12 pt-24 sm:min-h-[78vh] sm:px-6 sm:pb-16 sm:pt-28">
         <div className="mx-auto w-full max-w-7xl">
           <div className="mx-auto max-w-4xl text-center">
-            <h1 className="text-5xl font-semibold leading-none text-white sm:text-7xl">看清 AI 产业链。</h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-slate-400">
+            <h1 className="text-[2.5rem] font-semibold leading-[1.08] text-white sm:text-6xl lg:text-7xl">看清 AI 产业链。</h1>
+            <p className="mx-auto mt-4 max-w-sm text-base leading-7 text-slate-400 sm:mt-6 sm:max-w-xl sm:text-lg sm:leading-8">
               从一个问题进入，逐层展开 AI 产业链的供给、利润与瓶颈。
             </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-2">
+            <div className="mx-auto mt-7 grid w-full max-w-sm grid-cols-1 gap-2.5 sm:mt-8 sm:max-w-none sm:flex sm:flex-wrap sm:justify-center sm:gap-2">
               {researchQuestions.map((item) => (
                 <button
                   key={item.question}
                   type="button"
                   onClick={() => setActiveQuestion(item)}
-                  className={`min-h-11 rounded-full border px-4 py-2 text-sm transition ${
+                  className={`min-h-11 w-full rounded-full border px-4 py-2.5 text-[15px] transition sm:w-auto sm:py-2 sm:text-sm ${
                     item.question === activeQuestion.question
                       ? 'border-[#0071e3] bg-[#e8f2ff] text-[#005ecb] shadow-[0_10px_28px_rgba(0,113,227,0.12)]'
                       : 'border-slate-700/20 bg-white text-slate-400 hover:border-slate-400 hover:text-slate-200'
@@ -79,15 +79,15 @@ export const HomePage = () => {
                 </button>
               ))}
             </div>
-            <p className="mx-auto mt-5 max-w-xl text-sm leading-6 text-slate-400">{activeQuestion.answer}</p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Link to={activeQuestion.href}>
-                <Button variant="primary">
+            <p className="mx-auto mt-5 max-w-sm text-sm leading-7 text-slate-400 sm:max-w-xl sm:leading-6">{activeQuestion.answer}</p>
+            <div className="mx-auto mt-7 flex w-full max-w-sm flex-col items-stretch justify-center gap-3 sm:mt-8 sm:max-w-none sm:flex-row sm:items-center sm:gap-4">
+              <Link to={activeQuestion.href} className="w-full sm:w-auto">
+                <Button variant="primary" className="w-full sm:w-auto">
                   开始探索
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <HowToReadDialog />
+              <HowToReadDialog className="justify-center px-4 sm:px-1" />
             </div>
           </div>
         </div>

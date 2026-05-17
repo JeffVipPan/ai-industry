@@ -1,7 +1,8 @@
 import { Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { searchCatalog } from '../data/selectors';
+import { cn } from '../lib/utils';
 
 const resultHref = (type: string, id: string) => {
   if (type === 'company') return `/companies/${id}`;
@@ -10,14 +11,26 @@ const resultHref = (type: string, id: string) => {
   return `/map?query=${encodeURIComponent(id)}`;
 };
 
-export const SearchCommand = () => {
+type SearchCommandProps = {
+  autoFocus?: boolean;
+  className?: string;
+  onResultSelect?: () => void;
+};
+
+export const SearchCommand = ({ autoFocus = false, className, onResultSelect }: SearchCommandProps) => {
   const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const results = useMemo(() => searchCatalog(query), [query]);
 
+  useEffect(() => {
+    if (autoFocus) inputRef.current?.focus();
+  }, [autoFocus]);
+
   return (
-    <div className="relative w-full max-w-sm">
+    <div className={cn('relative w-full max-w-sm', className)}>
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
       <input
+        ref={inputRef}
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="搜索英伟达、台积电、芯片设计..."
@@ -30,7 +43,10 @@ export const SearchCommand = () => {
               <Link
                 key={`${result.type}-${result.id}`}
                 to={resultHref(result.type, result.id)}
-                onClick={() => setQuery('')}
+                onClick={() => {
+                  setQuery('');
+                  onResultSelect?.();
+                }}
                 className="flex items-center justify-between border-b border-slate-700/35 px-3 py-2.5 text-sm transition last:border-b-0 hover:bg-slate-950/35"
               >
                 <span className="text-slate-100">{result.label}</span>
