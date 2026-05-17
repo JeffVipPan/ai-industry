@@ -41,7 +41,7 @@ export const getGlossaryDefinition: (term: string) => string | undefined;
 
 ## 数据范围
 
-本轮只要求覆盖 `layers.coreTechnologies` 的 58 个唯一术语。它们来自产业层数据，是 P1.2 roadmap 点名的范围。
+本轮只要求覆盖运行时 `layers.coreTechnologies` 的 74 个唯一术语。它们来自产业层数据，是 P1.2 roadmap 点名的范围。`layers` 会合并 `source-terminal` 资料，因此覆盖范围以运行时导出的 `layers` 为准，而不是只看 seed 列表。
 
 暂不要求覆盖所有 `company.aiBusiness.coreProducts`。如果公司产品恰好命中 glossary，则 CompanyPage Badge 显示 title；如果没有命中，则保持原样，不显示空 title，不编造解释。
 
