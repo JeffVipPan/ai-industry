@@ -13,6 +13,7 @@ export type TimelineEvent = {
   month?: number;
   title: LocaleText;
   description: LocaleText;
+  whyItMatters: LocaleText;
   category: TimelineCategory;
   region: Region;
   importance: 1 | 2 | 3 | 4 | 5;

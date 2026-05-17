@@ -1,20 +1,21 @@
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { financialHistory } from '../data/financial';
-import { demoLabel } from '../lib/utils';
+
+const financialDataLabel = '营收参考公开资料，AI 收入为静态估算，非实时/审计口径。';
 
 export const FinancialChart = ({ companyId }: { companyId: string }) => {
   const data = financialHistory[companyId] ?? [];
 
   return (
-    <div className="glass-panel rounded-2xl p-4">
+    <div className="company-section-panel p-5">
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs text-slate-500">财务趋势（示意）</p>
-          <h3 className="text-lg font-semibold text-white">营收 / AI 收入</h3>
+          <p className="company-section-eyebrow">财务趋势（公开资料 + AI 估算）</p>
+          <h3 className="mt-1 text-2xl font-semibold text-white">营收 / AI 收入</h3>
         </div>
-        <p className="hidden max-w-xs text-right text-xs text-slate-500 sm:block">{demoLabel}</p>
+        <p className="hidden max-w-xs text-right text-xs text-slate-500 sm:block">{financialDataLabel}</p>
       </div>
-      <div className="h-72">
+      <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data}>
             <defs>
@@ -38,8 +39,8 @@ export const FinancialChart = ({ companyId }: { companyId: string }) => {
                 color: '#1d1d1f',
               }}
             />
-            <Area dataKey="revenue" stroke="#0071e3" fill="url(#revenue)" name="营收（示意）" />
-            <Area dataKey="aiRevenue" stroke="#34c759" fill="url(#aiRevenue)" name="AI 收入（示意）" />
+            <Area dataKey="revenue" stroke="#0071e3" fill="url(#revenue)" name="营收（公开资料口径）" />
+            <Area dataKey="aiRevenue" stroke="#34c759" fill="url(#aiRevenue)" name="AI 收入（静态估算）" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

@@ -5,7 +5,7 @@ export type LocaleText = {
 
 export type Region = 'global' | 'china' | 'us' | 'eu' | 'asia';
 export type ViewMode = 'global' | 'china';
-export type DataSource = 'illustrative-demo';
+export type DataSource = 'illustrative-demo' | 'static-estimate' | 'source-terminal-demo';
 
 export type EntityRef = {
   type: 'company' | 'layer';

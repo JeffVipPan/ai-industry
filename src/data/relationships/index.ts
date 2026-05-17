@@ -8,6 +8,7 @@ import type { EntityRef } from '../../types/common';
 import type { Relationship, RelationshipType } from '../../types/relationship';
 import { companies, companiesByLayer } from '../companies';
 import { layers } from '../layers';
+import { sourceTerminalRelationshipSeeds } from '../source-terminal/catalog';
 
 let sequence = 0;
 
@@ -19,6 +20,7 @@ const rel = (
   bidirectional = false,
   description?: Relationship['description'],
   valueFlow?: Relationship['valueFlow'],
+  dataSource: Relationship['_meta']['dataSource'] = 'illustrative-demo',
 ): Relationship => ({
   id: `rel-${String(sequence++).padStart(4, '0')}-${from.id}-${to.id}-${type}`,
   from,
@@ -28,7 +30,7 @@ const rel = (
   bidirectional,
   description,
   valueFlow,
-  _meta: { dataSource: 'illustrative-demo' },
+  _meta: { dataSource },
 });
 
 const company = (id: string): EntityRef => ({ type: 'company', id });
@@ -131,8 +133,76 @@ const adjacentSupplyLinks = layers.slice(0, -1).flatMap((item, index) => {
   return links;
 });
 
+type SourceTerminalRelationshipSeed = {
+  id: string;
+  source: string;
+  target: string;
+  type: string;
+  strength: number;
+  description?: string;
+  valueFlow?: number;
+  label?: string;
+};
+
+const relationshipTypeMap: Record<string, RelationshipType> = {
+  supplier: 'supplier',
+  customer: 'customer',
+  competitor: 'competitor',
+  partner: 'ecosystem',
+  investor: 'investor',
+  'cloud-partner': 'cloud-partner',
+  manufacturing: 'manufacturing',
+  'model-provider': 'model-provider',
+  infrastructure: 'infrastructure',
+  ecosystem: 'ecosystem',
+};
+
+const layerIdSet = new Set(layers.map((item) => item.id));
+const companyIdSet = new Set(companies.map((item) => item.id));
+const toEntityRef = (id: string): EntityRef | null => {
+  if (layerIdSet.has(id)) return layer(id);
+  if (companyIdSet.has(id)) return company(id);
+  return null;
+};
+const toRelationshipStrength = (strength: number): Relationship['strength'] =>
+  Math.max(1, Math.min(5, Math.ceil(strength / 2))) as Relationship['strength'];
+
+const importedTerminalLinks: Relationship[] = (sourceTerminalRelationshipSeeds as readonly SourceTerminalRelationshipSeed[]).flatMap(
+  (source) => {
+    const from = toEntityRef(source.source);
+    const to = toEntityRef(source.target);
+    const type = relationshipTypeMap[source.type];
+    if (!from || !to || !type) return [];
+
+    return [
+      rel(
+        from,
+        to,
+        type,
+        toRelationshipStrength(source.strength),
+        ['competitor', 'cloud-partner', 'ecosystem'].includes(type),
+        source.description
+          ? {
+              en: source.description,
+              zh: source.description,
+            }
+          : undefined,
+        typeof source.valueFlow === 'number' && source.valueFlow > 0
+          ? {
+              direction: 'from-to',
+              estimatedValue: source.valueFlow,
+              valueType: type === 'investor' ? 'capex' : type === 'supplier' || type === 'customer' ? 'revenue' : 'profit',
+            }
+          : undefined,
+        'source-terminal-demo',
+      ),
+    ];
+  },
+);
+
 export const relationships: Relationship[] = [
   ...strategicRelationships,
+  ...importedTerminalLinks,
   ...layerChain,
   ...layerCompanyLinks,
   ...competitorLinks,

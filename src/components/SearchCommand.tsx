@@ -20,7 +20,7 @@ export const SearchCommand = () => {
       <input
         value={query}
         onChange={(event) => setQuery(event.target.value)}
-        placeholder="搜索 NVIDIA、TSMC、芯片设计..."
+        placeholder="搜索英伟达、台积电、芯片设计..."
         className="h-10 w-full rounded-full border border-slate-600/30 bg-white/75 pl-9 pr-3 text-sm text-slate-200 outline-none transition placeholder:text-slate-600 focus:border-slate-400 focus:bg-white"
       />
       {query ? (
@@ -41,7 +41,7 @@ export const SearchCommand = () => {
             <div className="px-4 py-6 text-center">
               <div className="mx-auto mb-3 h-8 w-8 rounded-full border border-dashed border-cyan-200/30 bg-cyan-200/5 shadow-glow" />
               <p className="text-sm text-slate-300">未找到与 “{query}” 相关的节点</p>
-              <p className="mt-1 text-xs text-slate-500">试试 NVIDIA、TSMC、芯片设计、云平台</p>
+              <p className="mt-1 text-xs text-slate-500">试试英伟达、台积电、芯片设计、云平台</p>
             </div>
           )}
         </div>

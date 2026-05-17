@@ -1,4 +1,4 @@
-import { BookOpen, ChevronUp, Map, Route, Search, Sparkles } from 'lucide-react';
+import { BookOpen, ChevronUp, Gauge, Map, Route, Search, Sparkles } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { companies } from '../data/companies';
@@ -9,6 +9,7 @@ import { SearchCommand } from './SearchCommand';
 
 const navItems = [
   { href: '/', label: '概览', icon: Sparkles },
+  { href: '/console', label: '控制台', icon: Gauge },
   { href: '/map', label: '图谱', icon: Map },
   { href: '/value-flow', label: '价值流', icon: Route },
   { href: '/timeline', label: '时间线', icon: ChevronUp },
@@ -19,6 +20,7 @@ export const AppShell = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const { mode, setMode, exploredIds } = useAppStore();
   const depth = pathname.startsWith('/companies') || pathname.startsWith('/layers') ? 'L3' : pathname === '/' ? 'L1 → L2' : 'L2';
+  const isWorkspacePage = pathname === '/map' || pathname === '/console';
 
   return (
     <div className="relative min-h-screen">
@@ -26,7 +28,7 @@ export const AppShell = ({ children }: PropsWithChildren) => {
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
           <button onClick={() => navigate('/')} className="flex min-w-fit items-center gap-2 text-left">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-[#0071e3] text-[11px] font-semibold text-white">AI</span>
-            <span className="hidden text-sm font-semibold text-slate-100 sm:inline">AI Industry</span>
+            <span className="hidden text-sm font-semibold text-slate-100 sm:inline">AI 产业图谱</span>
           </button>
           <nav className="hidden items-center gap-1 md:flex">
             {navItems.map((item) => {
@@ -69,20 +71,24 @@ export const AppShell = ({ children }: PropsWithChildren) => {
         </div>
       </header>
       <main>{children}</main>
-      <aside className="fixed bottom-4 left-4 z-40 hidden max-w-xs rounded-full border border-cyan-300/15 bg-white/80 px-3 py-2 text-xs text-slate-400 shadow-glow backdrop-blur md:block">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-cyan-200">{depth}</span>
-          <span>探索深度</span>
-          <span className="ml-auto font-mono">{exploredIds.length}/{layers.length + companies.length}</span>
-        </div>
-      </aside>
-      <button
-        onClick={() => navigate('/map')}
-        className="fixed bottom-4 right-4 z-40 hidden items-center gap-2 rounded-full border border-cyan-300/25 bg-white/85 px-4 py-3 text-sm text-cyan-100 shadow-glow backdrop-blur transition hover:bg-white md:flex"
-      >
-        <BookOpen className="h-4 w-4" />
-        打开图谱
-      </button>
+      {!isWorkspacePage ? (
+        <aside className="fixed bottom-4 left-4 z-40 hidden max-w-xs rounded-full border border-cyan-300/15 bg-white/80 px-3 py-2 text-xs text-slate-400 shadow-glow backdrop-blur md:block">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-cyan-200">{depth}</span>
+            <span>探索深度</span>
+            <span className="ml-auto font-mono">{exploredIds.length}/{layers.length + companies.length}</span>
+          </div>
+        </aside>
+      ) : null}
+      {!isWorkspacePage ? (
+        <button
+          onClick={() => navigate('/map')}
+          className="fixed bottom-4 right-4 z-40 hidden items-center gap-2 rounded-full border border-cyan-300/25 bg-white/85 px-4 py-3 text-sm text-cyan-100 shadow-glow backdrop-blur transition hover:bg-white md:flex"
+        >
+          <BookOpen className="h-4 w-4" />
+          打开图谱
+        </button>
+      ) : null}
     </div>
   );
 };

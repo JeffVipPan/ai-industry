@@ -5,6 +5,7 @@ import type { Relationship, RelationshipType } from '../types/relationship';
 import { companies } from './companies';
 import { layers } from './layers';
 import { relationships, relationshipTypes } from './relationships';
+import { companyTypeLabel, displayTerm, relationshipTypeLabel } from '../lib/labels';
 
 export type SearchResult =
   | { type: 'company'; id: string; label: string; meta: string }
@@ -55,12 +56,13 @@ export const searchCatalog = (rawQuery: string): SearchResult[] => {
         layer.description.short.en,
         layer.description.short.zh,
         ...layer.coreTechnologies,
+        ...layer.coreTechnologies.map(displayTerm),
       ]
         .join(' ')
         .toLowerCase();
       return searchable.includes(query);
     })
-    .map((layer) => ({ type: 'layer', id: layer.id, label: layer.name.zh, meta: layer.name.en }));
+    .map((layer) => ({ type: 'layer', id: layer.id, label: layer.name.zh, meta: '产业层' }));
 
   const companyResults: SearchResult[] = companies
     .filter((company) => {
@@ -70,6 +72,7 @@ export const searchCatalog = (rawQuery: string): SearchResult[] => {
         company.name.zh,
         company.basicInfo.ticker,
         ...company.aiBusiness.coreProducts,
+        ...company.aiBusiness.coreProducts.map(displayTerm),
         ...company.aiBusiness.moats.map((moat) => moat.type),
       ]
         .filter(Boolean)
@@ -77,16 +80,16 @@ export const searchCatalog = (rawQuery: string): SearchResult[] => {
         .toLowerCase();
       return searchable.includes(query);
     })
-    .map((company) => ({ type: 'company', id: company.id, label: company.name.en, meta: company.name.zh }));
+    .map((company) => ({ type: 'company', id: company.id, label: company.name.zh, meta: companyTypeLabel[company.basicInfo.type] }));
 
   const technologyResults: SearchResult[] = layers
     .flatMap((layer) => layer.coreTechnologies.map((tech) => ({ layer, tech })))
-    .filter(({ tech }) => tech.toLowerCase().includes(query))
-    .map(({ layer, tech }) => ({ type: 'technology', id: `${layer.id}-${tech}`, label: tech, meta: layer.name.zh }));
+    .filter(({ tech }) => `${tech} ${displayTerm(tech)}`.toLowerCase().includes(query))
+    .map(({ layer, tech }) => ({ type: 'technology', id: `${layer.id}-${tech}`, label: displayTerm(tech), meta: layer.name.zh }));
 
   const relationshipResults: SearchResult[] = relationshipTypes
-    .filter((type) => type.includes(query))
-    .map((type) => ({ type: 'relationship-type', id: type, label: type, meta: '关系筛选' }));
+    .filter((type) => `${type} ${relationshipTypeLabel[type]}`.toLowerCase().includes(query))
+    .map((type) => ({ type: 'relationship-type', id: type, label: relationshipTypeLabel[type], meta: '关系筛选' }));
 
   return [...companyResults, ...layerResults, ...technologyResults, ...relationshipResults].slice(0, 12);
 };

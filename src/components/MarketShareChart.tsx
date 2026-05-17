@@ -4,7 +4,7 @@ import type { Layer } from '../types/layer';
 
 export const MarketShareChart = ({ layer }: { layer: Layer }) => {
   const data = layer.globalLandscape.marketShare.map((item) => ({
-    name: getCompanyById(item.companyId)?.name.en ?? item.companyId,
+    name: getCompanyById(item.companyId)?.name.zh ?? item.companyId,
     share: item.share,
   }));
 

@@ -5,6 +5,8 @@
  */
 import type { TimelineCategory, TimelineEvent } from '../../types/timeline';
 
+type TimelineEventSeed = Omit<TimelineEvent, 'whyItMatters'>;
+
 const categoryColor: Record<TimelineCategory, string> = {
   model: '#4f8cff',
   hardware: '#0ea5e9',
@@ -14,7 +16,7 @@ const categoryColor: Record<TimelineCategory, string> = {
   policy: '#64748b',
 };
 
-const events: TimelineEvent[] = [
+const eventSeeds: TimelineEventSeed[] = [
   {
     id: 'alexnet-2012',
     year: 2012,
@@ -1379,6 +1381,226 @@ const events: TimelineEvent[] = [
   },
 ];
 
-export const timelineEvents: TimelineEvent[] = events.sort(
-  (a, b) => a.year - b.year || (a.month ?? 0) - (b.month ?? 0) || b.importance - a.importance,
-);
+const whyItMattersByEventId: Record<string, TimelineEvent['whyItMatters']> = {
+  'alexnet-2012': {
+    en: '',
+    zh: '让 GPU 训练深度网络成为视觉路线的默认选择，奠定后续算力竞赛的基础。',
+  },
+  'transformer-2017': {
+    en: '',
+    zh: '换掉了 RNN/CNN 的主导地位，为后续 GPT 系列、Gemini 等基础模型提供架构原型。',
+  },
+  'word2vec-2013': {
+    en: '',
+    zh: '把词语表示从稀疏符号推向可计算向量，为后续语义搜索、推荐和语言模型预训练铺路。',
+  },
+  'gan-2014': {
+    en: '',
+    zh: '让生成模型拥有对抗训练范式，推动图像生成、数据增强和后续扩散模型竞赛的想象空间。',
+  },
+  'resnet-2015': {
+    en: '',
+    zh: '解决深层网络训练退化难题，让更深视觉模型可持续扩展，也影响后续多模态编码器设计。',
+  },
+  'alphago-2016': {
+    en: '',
+    zh: '把深度学习与搜索决策结合成可验证系统，证明 AI 可以在复杂策略任务中超越专家。',
+  },
+  'google-tpu-2016': {
+    en: '',
+    zh: '把机器学习负载推向专用芯片路线，为云厂商自研加速器和算力差异化开了先例。',
+  },
+  'china-ai-plan-2017': {
+    en: '',
+    zh: '把 AI 上升为国家产业战略，后续模型、应用和治理政策都有了统一的政策坐标。',
+  },
+  'bert-2018': {
+    en: '',
+    zh: '让双向预训练成为 NLP 默认底座，推动搜索、问答和企业文本理解模型快速产品化。',
+  },
+  'microsoft-openai-2019': {
+    en: '',
+    zh: '把 OpenAI 的模型路线与 Azure 算力绑定，为后续 GPT-3、ChatGPT 和企业云竞争埋下伏笔。',
+  },
+  'gpt3-2020': {
+    en: '',
+    zh: '用参数规模和少样本能力证明 scaling law 的商业潜力，直接铺垫 ChatGPT 式交互产品。',
+  },
+  'alphafold2-2020': {
+    en: '',
+    zh: '证明大模型方法能攻克高价值科学问题，让 AI for Science 从演示走向产业研发议题。',
+  },
+  'clip-2021': {
+    en: '',
+    zh: '把文本与图像放进同一表示空间，为文生图、多模态检索和视觉语言模型打下连接方式。',
+  },
+  'github-copilot-2021': {
+    en: '',
+    zh: '把生成式 AI 嵌入开发者日常工作流，提前展示基础模型如何转化为可付费应用。',
+  },
+  'h100-hopper-2022': {
+    en: '',
+    zh: '把 Transformer 加速写进数据中心 GPU 路线，成为 2023-2025 年训练集群扩张的硬件底座。',
+  },
+  'stable-diffusion-2022': {
+    en: '',
+    zh: '把文生图能力带入开放生态和本地实验，改变创意工具竞争和模型分发方式。',
+  },
+  'aws-trainium-trn1-2022': {
+    en: '',
+    zh: '显示云厂商不只采购 GPU，也会自研训练芯片来争夺成本、供给和平台控制权。',
+  },
+  'chatgpt-2022': {
+    en: '',
+    zh: '把大模型从研究能力变成大众入口，触发应用、算力、监管和资本四条主线同时升温。',
+  },
+  'gpt4-2023': {
+    en: '',
+    zh: '把多模态和更强推理带入旗舰模型竞争，强化企业客户对闭源基础模型的付费预期。',
+  },
+  'ernie-bot-2023': {
+    en: '',
+    zh: '标志中国大厂正式把大模型推向产品前台，开启本土模型与应用生态的密集竞争。',
+  },
+  'google-vertex-genai-2023': {
+    en: '',
+    zh: '把基础模型纳入企业云开发平台，说明模型竞争会通过云工具链和托管服务落地。',
+  },
+  'dgx-gh200-2023': {
+    en: '',
+    zh: '把单卡能力扩展到大内存系统级方案，预示 AI 竞争从芯片转向整机与集群架构。',
+  },
+  'databricks-mosaicml-2023': {
+    en: '',
+    zh: '把企业数据平台和模型训练平台合并，强化“用自有数据训私有模型”的市场叙事。',
+  },
+  'llama2-2023': {
+    en: '',
+    zh: '让开放权重模型进入商业可用阶段，给闭源 API 之外的部署、微调和生态路线降门槛。',
+  },
+  'amazon-anthropic-2023': {
+    en: '',
+    zh: '把 Anthropic 的模型路线与 AWS 芯片/云绑定，强化云厂商围绕模型伙伴的军备竞赛。',
+  },
+  'mistral-7b-2023': {
+    en: '',
+    zh: '证明小团队也能用开放模型撬动开发者生态，为欧洲基础模型公司争取全球可见度。',
+  },
+  'amazon-bedrock-ga-2023': {
+    en: '',
+    zh: '把多模型接入包装成托管云服务，让企业采用生成式 AI 时少面对底层模型碎片化。',
+  },
+  'gemini-2023': {
+    en: '',
+    zh: '让 Google 重新把研究、消费端和云端模型线合并，成为 GPT-4 之后的重要对标点。',
+  },
+  'china-generative-ai-measures-2023': {
+    en: '',
+    zh: '为公开生成式 AI 服务划出合规边界，影响中国模型发布、备案和产品上线节奏。',
+  },
+  'claude3-2024': {
+    en: '',
+    zh: '把长上下文、视觉和企业可靠性推到前台，扩大闭源模型竞争不只看单次问答的维度。',
+  },
+  'llama3-2024': {
+    en: '',
+    zh: '把开放模型能力直接接入消费级助手，显示开源权重也能支撑大规模应用入口。',
+  },
+  'alphafold3-2024': {
+    en: '',
+    zh: '把结构预测从蛋白质扩展到分子交互，进一步把 AI for Science 推向药物研发流程。',
+  },
+  'gpt4o-2024': {
+    en: '',
+    zh: '把文本、语音和视觉体验统一到更快模型上，推动实时多模态交互成为产品标准。',
+  },
+  'eu-ai-act-2024': {
+    en: '',
+    zh: '建立风险分级监管样板，让模型提供商和应用方都必须把合规纳入产品路线。',
+  },
+  'sora-2024': {
+    en: '',
+    zh: '把视频生成提升为基础模型竞赛的新战场，也让内容安全和算力成本问题更突出。',
+  },
+  'blackwell-2024': {
+    en: '',
+    zh: '把后 Hopper 时代的训练与推理需求提前锁定，继续强化 NVIDIA 在 AI 工厂中的定价权。',
+  },
+  'apple-intelligence-2024': {
+    en: '',
+    zh: '把生成式 AI 放进操作系统级入口，说明模型能力会通过终端生态重新分配用户触点。',
+  },
+  'claude35-sonnet-2024': {
+    en: '',
+    zh: '让编码、视觉和推理能力在中档成本上提升，推动企业把模型选择从最强转向性价比。',
+  },
+  'llama31-2024': {
+    en: '',
+    zh: '用 405B 开放模型提高开放生态上限，推动云、硬件和开发工具围绕 Llama 做适配。',
+  },
+  'openai-o1-2024': {
+    en: '',
+    zh: '把测试时计算和推理模型推到主线，提示模型进步不再只依赖更大预训练规模。',
+  },
+  'qwen25-2024': {
+    en: '',
+    zh: '扩大中国开放权重模型供给，让代码、数学和通用模型形成更细分的本土开发者生态。',
+  },
+  'stargate-2025': {
+    en: '',
+    zh: '把 AI 竞争直接推到巨额基础设施投资层面，数据中心、电力和芯片成为模型公司的核心约束。',
+  },
+  'deepseek-r1-2025': {
+    en: '',
+    zh: '用开源权重和强化学习推理路线冲击全球预期，迫使市场重新评估模型成本与能力边界。',
+  },
+  'eu-ai-gigafactories-2026': {
+    en: '',
+    zh: '把主权算力制度化为产业政策工具，说明欧洲要从监管者进一步变成算力建设者。',
+  },
+  'un-ai-scientific-panel-2026': {
+    en: '',
+    zh: '为全球 AI 治理提供持续科学评估机制，缓和各国规则碎片化带来的信任缺口。',
+  },
+  'gemini-31-pro-2026': {
+    en: '',
+    zh: '把复杂推理能力推向 Google 的消费、开发和企业渠道，延续闭源旗舰模型的追赶赛。',
+  },
+  'openai-amazon-2026': {
+    en: '',
+    zh: '让 OpenAI 的基础设施伙伴更分散，也让 AWS 在顶级模型工作负载中争回位置。',
+  },
+  'vera-rubin-2026': {
+    en: '',
+    zh: '把 AI Factory 进一步做成机架级系统，强化算力竞争从 GPU 单品转向整栈交付。',
+  },
+  'physical-ai-industrial-2026': {
+    en: '',
+    zh: '把机器人和工业 AI 从演示推向部署语境，连接基础模型、仿真和制造业自动化。',
+  },
+  'gpt55-2026': {
+    en: '',
+    zh: '把长任务智能体和计算机操作推到专业工作场景，扩大模型从回答问题到执行工作的边界。',
+  },
+  'claude-opus-47-2026': {
+    en: '',
+    zh: '把长任务编码能力分发到多云渠道，说明前沿模型竞争也取决于企业采购入口。',
+  },
+  'deepseek-v4-2026': {
+    en: '',
+    zh: '延续中国开放模型的低成本竞争压力，让 API、透明度和推理效率成为下一轮比较点。',
+  },
+  'china-agent-governance-2026': {
+    en: '',
+    zh: '把智能体应用纳入标准、身份和安全治理框架，为大规模落地先设定边界。',
+  },
+  'isomorphic-series-b-2026': {
+    en: '',
+    zh: '让 AI 药物发现获得大额长期资本，显示基础模型价值正在进入高风险科学产业链。',
+  },
+};
+
+export const timelineEvents: TimelineEvent[] = eventSeeds.map((event) => ({
+  ...event,
+  whyItMatters: whyItMattersByEventId[event.id],
+}));

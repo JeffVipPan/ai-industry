@@ -5,7 +5,7 @@ import { financialHistory } from '../financial';
 import { getLayerById, layers } from '../layers';
 import { relationships } from '../relationships';
 import { timelineEvents } from '../timeline';
-import { valueFlowScenarios } from '../value-flows';
+import { valueFlows } from '../value-flows';
 
 export type CompanyFilter = {
   layerId?: string;
@@ -48,8 +48,8 @@ export const mockAdapter = {
   async getRelationships() {
     return relationships;
   },
-  async getValueFlowScenarios() {
-    return valueFlowScenarios;
+  async getValueFlows() {
+    return valueFlows;
   },
   async getTimelineEvents() {
     return timelineEvents;

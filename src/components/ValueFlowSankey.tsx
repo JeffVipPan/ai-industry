@@ -13,11 +13,13 @@ import { Badge } from './ui/Badge';
 type AnalysisView = 'allocation' | 'topology';
 type FlowType = NormalizedValueFlowLink['flowType'];
 type NodeRole = 'source' | 'intermediate' | 'terminal' | 'path';
+type NodeLabelPosition = 'left' | 'right' | 'top';
 
 export type SankeyNodeInput = {
   id: string;
   name: string;
   role: NodeRole;
+  labelPosition?: NodeLabelPosition;
 };
 
 export type SankeyLinkInput = {
@@ -28,6 +30,8 @@ export type SankeyLinkInput = {
   flowType: FlowType;
   label: string;
   description: string;
+  evidence?: NormalizedValueFlowLink['evidence'];
+  confidence?: NormalizedValueFlowLink['confidence'];
   sourceLabel?: string;
   targetLabel?: string;
 };
@@ -91,6 +95,7 @@ export const buildSankeyOption = (input: SankeyOptionInput) => {
       borderColor: 'rgba(29,29,31,0.12)',
       borderWidth: 1,
     },
+    ...(node.labelPosition ? { label: { position: node.labelPosition } } : {}),
   }));
 
   const linkData = links.map((link) => {
@@ -106,6 +111,8 @@ export const buildSankeyOption = (input: SankeyOptionInput) => {
       flowDescription: link.description,
       flowType: link.flowType,
       flowUnit: unit,
+      flowEvidence: link.evidence,
+      flowConfidence: link.confidence,
     };
   });
 
@@ -134,13 +141,20 @@ export const buildSankeyOption = (input: SankeyOptionInput) => {
             flowDescription: string;
             flowType: FlowType;
             flowUnit: string;
+            flowEvidence?: NormalizedValueFlowLink['evidence'];
+            flowConfidence?: NormalizedValueFlowLink['confidence'];
           };
           const typeLabel = flowTypeLabels[d.flowType];
+          const evidenceText =
+            d.flowEvidence && d.flowConfidence
+              ? `<div style="margin-top:6px;font-size:11px;color:#86868b">${evidenceLabels[d.flowEvidence]} · ${confidenceLabels[d.flowConfidence]}</div>`
+              : '';
           return (
             `<div style="font-weight:600;color:#1d1d1f">${d.source} → ${d.target}</div>` +
             `<div style="margin-top:4px;color:#6e6e73">${d.flowLabel} · <span style="font-family:SFMono-Regular,monospace">${formatValue(d.value, d.flowUnit)}</span></div>` +
             `<div style="margin-top:6px;font-size:11px;color:#86868b">${d.flowDescription}</div>` +
-            `<div style="margin-top:6px;font-size:11px;color:${flowColors[d.flowType]}">${typeLabel}</div>`
+            `<div style="margin-top:6px;font-size:11px;color:${flowColors[d.flowType]}">${typeLabel}</div>` +
+            evidenceText
           );
         }
         return `<div style="font-weight:600;color:#1d1d1f">${params.name ?? '节点'}</div>`;
@@ -151,16 +165,28 @@ export const buildSankeyOption = (input: SankeyOptionInput) => {
         type: 'sankey',
         data,
         links: linkData,
+        left: compact ? 24 : 128,
+        right: compact ? 96 : 180,
+        top: compact ? 12 : 36,
+        bottom: compact ? 12 : 36,
         nodeWidth: compact ? 12 : 16,
-        nodeGap: compact ? 8 : 14,
+        nodeGap: compact ? 8 : 18,
         nodeAlign: 'justify',
         draggable: !compact,
         emphasis: { focus: 'adjacency', blurScope: 'global' },
         label: {
           color: '#1d1d1f',
           fontSize: compact ? 10 : 12,
+          distance: compact ? 5 : 8,
+          width: compact ? 84 : 108,
+          overflow: 'truncate',
+          ellipsis: '...',
           fontFamily:
             '"PingFang SC","Hiragino Sans GB","Microsoft YaHei",ui-sans-serif,sans-serif',
+        },
+        labelLayout: {
+          moveOverlap: 'shiftY',
+          hideOverlap: true,
         },
         itemStyle: { borderColor: 'rgba(29,29,31,0.12)', borderWidth: 1 },
         lineStyle: { curveness: 0.55 },
@@ -183,9 +209,27 @@ const selectPathView = (viewId: string): ValueFlowPathView =>
 
 const topologyNodes = (links: ValueFlowPathLink[]): SankeyNodeInput[] => {
   const nodes = new Map<string, SankeyNodeInput>();
+  const sources = new Set(links.map((link) => link.source));
+  const targets = new Set(links.map((link) => link.target));
+  const labelPositionFor = (id: string): NodeLabelPosition => {
+    if (!targets.has(id)) return 'left';
+    if (sources.has(id)) return 'top';
+    return 'right';
+  };
+
   links.forEach((link) => {
-    nodes.set(link.source, { id: link.source, name: link.sourceLabel, role: 'path' });
-    nodes.set(link.target, { id: link.target, name: link.targetLabel, role: 'path' });
+    nodes.set(link.source, {
+      id: link.source,
+      name: link.sourceLabel,
+      role: 'path',
+      labelPosition: labelPositionFor(link.source),
+    });
+    nodes.set(link.target, {
+      id: link.target,
+      name: link.targetLabel,
+      role: 'path',
+      labelPosition: labelPositionFor(link.target),
+    });
   });
   return Array.from(nodes.values());
 };
@@ -227,6 +271,8 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
           flowType: link.flowType,
           label: link.label,
           description: link.description,
+          evidence: link.evidence,
+          confidence: link.confidence,
         })),
         compact,
         pinnedFlowId,
@@ -245,6 +291,8 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
         description: link.description,
         sourceLabel: link.sourceLabel,
         targetLabel: link.targetLabel,
+        evidence: link.evidence,
+        confidence: link.confidence,
       })),
       compact,
       pinnedFlowId,
@@ -254,7 +302,16 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
 
   const option = useMemo(() => buildSankeyOption(optionInput), [optionInput]);
 
-  const height = compact ? 420 : displayView === 'topology' ? 720 : 640;
+  const height = compact ? 420 : displayView === 'topology' ? 820 : 640;
+  const expandTopologyCanvas = !compact && displayView === 'topology';
+  const bodyClassName = compact
+    ? 'p-4'
+    : expandTopologyCanvas
+      ? 'grid gap-0'
+      : 'grid gap-0 lg:grid-cols-[minmax(0,1fr)_360px]';
+  const asideClassName = expandTopologyCanvas
+    ? 'border-t border-slate-700/20 bg-[#fbfbfd]/90 p-5'
+    : 'border-t border-slate-700/20 bg-[#fbfbfd]/90 p-5 lg:border-l lg:border-t-0';
 
   const handleChartClick = (params: { dataType?: string; data?: { flowId?: string } }) => {
     if (compact) return;
@@ -348,7 +405,7 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
         </div>
       ) : null}
 
-      <div className={compact ? 'p-4' : 'grid gap-0 lg:grid-cols-[1fr_360px]'}>
+      <div className={bodyClassName}>
         <div className="min-w-0 bg-white/72 p-4">
           <ReactECharts
             option={option}
@@ -360,7 +417,7 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
         </div>
 
         {!compact ? (
-          <aside className="border-t border-slate-700/20 bg-[#fbfbfd]/90 p-5 lg:border-l lg:border-t-0">
+          <aside className={asideClassName}>
             {displayView === 'allocation' ? (
               <>
                 <div>
@@ -472,6 +529,10 @@ export const ValueFlowSankey = ({ compact = false }: { compact?: boolean }) => {
                     </p>
                     <p className="mt-3 font-mono text-xs text-slate-500">
                       {activePathFlow.label} · {formatValue(activePathFlow.value, pathView.unit)}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {evidenceLabels[activePathFlow.evidence]} ·{' '}
+                      {confidenceLabels[activePathFlow.confidence]}
                     </p>
                     {pinnedFlowId === activePathFlow.id ? (
                       <button

@@ -38,9 +38,9 @@ export const apiAdapter: DataAdapter = {
     if (!res.ok) return mockAdapter.getRelationships();
     return res.json();
   },
-  async getValueFlowScenarios() {
+  async getValueFlows() {
     const res = await fetch('/api/value-flows');
-    if (!res.ok) return mockAdapter.getValueFlowScenarios();
+    if (!res.ok) return mockAdapter.getValueFlows();
     return res.json();
   },
   async getTimelineEvents() {

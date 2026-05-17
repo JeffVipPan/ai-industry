@@ -108,6 +108,30 @@ describe('buildSankeyOption', () => {
     expect(compactLabel.fontSize).toBeLessThan(wideLabel.fontSize);
   });
 
+  it('guards dense node labels from colliding with adjacent columns', () => {
+    const option = buildSankeyOption(baseInput);
+    const series = (option.series as Array<Record<string, unknown>>)[0];
+    const label = series.label as { overflow: string; width: number };
+    const labelLayout = series.labelLayout as { hideOverlap: boolean };
+
+    expect(label.overflow).toBe('truncate');
+    expect(label.width).toBeGreaterThan(0);
+    expect(labelLayout.hideOverlap).toBe(true);
+  });
+
+  it('lets dense topology nodes override label placement per node', () => {
+    const option = buildSankeyOption({
+      ...baseInput,
+      nodes: baseInput.nodes.map((node, index) =>
+        index === 0 ? { ...node, labelPosition: 'left' } : node,
+      ) as SankeyOptionInput['nodes'],
+    });
+    const series = (option.series as Array<Record<string, unknown>>)[0];
+    const data = series.data as Array<{ name: string; label?: { position: string } }>;
+
+    expect(data.find((node) => node.name === '源节点')?.label?.position).toBe('left');
+  });
+
   it('attaches adjacency emphasis and a tooltip formatter', () => {
     const option = buildSankeyOption(baseInput);
     const series = (option.series as Array<Record<string, unknown>>)[0];
@@ -131,5 +155,44 @@ describe('buildSankeyOption', () => {
       flowUnit: '单位',
       flowType: 'revenue',
     });
+  });
+
+  it('carries evidence and confidence into link payloads and edge tooltips', () => {
+    const option = buildSankeyOption({
+      ...baseInput,
+      links: baseInput.links.map((link) => ({
+        ...link,
+        evidence: 'analyst-assumption',
+        confidence: 'medium',
+      })),
+    } as SankeyOptionInput);
+    const series = (option.series as Array<Record<string, unknown>>)[0];
+    const links = series.links as Array<{
+      flowId: string;
+      flowEvidence?: string;
+      flowConfidence?: string;
+    }>;
+    const sample = links.find((link) => link.flowId === 'L1');
+    const formatter = (option.tooltip as { formatter: (params: unknown) => string }).formatter;
+    const tooltipHtml = formatter({
+      dataType: 'edge',
+      data: {
+        ...sample,
+        source: '源节点',
+        target: '中转节点',
+        value: 60,
+        flowLabel: '收入流',
+        flowDescription: '从源到中转',
+        flowType: 'revenue',
+        flowUnit: '单位',
+      },
+    });
+
+    expect(sample).toMatchObject({
+      flowEvidence: 'analyst-assumption',
+      flowConfidence: 'medium',
+    });
+    expect(tooltipHtml).toContain('分析假设');
+    expect(tooltipHtml).toContain('中置信');
   });
 });

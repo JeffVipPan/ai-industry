@@ -1,13 +1,12 @@
-import { BookOpen, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '../lib/utils';
-import { Button } from './ui/Button';
 
 const readingSteps = [
   {
     title: '先选一个问题',
-    copy: '从 NVIDIA 护城河、利润池流向、中国 AI 瓶颈这类问题进入。',
+    copy: '从英伟达护城河、利润池流向、中国 AI 瓶颈这类问题进入。',
   },
   {
     title: '再看产业链章节',
@@ -85,16 +84,17 @@ export const HowToReadDialog = ({ className }: { className?: string }) => {
 
   return (
     <>
-      <Button
+      <button
         type="button"
-        variant="outline"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
-        className={cn('bg-white/80 text-[#005ecb] hover:text-[#005ecb]', className)}
+        className={cn(
+          'inline-flex min-h-11 items-center px-1 text-sm font-medium text-cyan-200 underline-offset-4 transition hover:text-white hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#0071e3]',
+          className,
+        )}
       >
-        <BookOpen className="h-4 w-4" aria-hidden="true" />
-        如何阅读
-      </Button>
+        阅读说明
+      </button>
 
       {open ? createPortal(dialog, document.body) : null}
     </>

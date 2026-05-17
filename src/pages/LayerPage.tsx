@@ -2,6 +2,7 @@ import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { companiesByLayer } from '../data/companies';
+import { getGlossaryDefinition } from '../data/glossary';
 import { getLayerById } from '../data/layers';
 import { useAppStore } from '../store/useAppStore';
 import { DemoDataNotice } from '../components/DemoDataNotice';
@@ -10,7 +11,11 @@ import { MetricCard } from '../components/MetricCard';
 import { RelationshipGraph } from '../components/RelationshipGraph';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
-import { companyTypeLabel, pricingPowerLabel } from '../lib/labels';
+import { companyTypeLabel, displayCountry, displayTerm, pricingPowerLabel } from '../lib/labels';
+
+const describeLayerTechnology = (technology: string, layerName: string) =>
+  getGlossaryDefinition(technology) ??
+  `${displayTerm(technology)}在${layerName}环节中承担关键能力模块，决定该层的性能边界、成本结构和上下游协同效率。`;
 
 export const LayerPage = () => {
   const { layerId = '' } = useParams();
@@ -58,7 +63,7 @@ export const LayerPage = () => {
           </div>
         </article>
         <aside className="glass-panel h-fit rounded-2xl p-5">
-          <p className="text-sm font-semibold text-white">On this page</p>
+          <p className="text-sm font-semibold text-white">本页导航</p>
           <div className="mt-4 space-y-2 text-sm text-slate-400">
             <a href="#summary" className="block text-cyan-200">摘要</a>
             <a href="#metrics" className="block">指标</a>
@@ -74,7 +79,7 @@ export const LayerPage = () => {
       <section id="metrics" className="mt-8 grid gap-4 lg:ml-[212px] lg:grid-cols-4">
         <MetricCard label="技术壁垒" value={`${layer.technicalBarrier}/5`} />
         <MetricCard label="国产替代率" value={`${Math.round(layer.chinaLandscape.localizationRate * 100)}%`} />
-        <MetricCard label="定价权" value={pricingPowerLabel[layer.pricingPower]} />
+        <MetricCard label="价格话语权" value={pricingPowerLabel[layer.pricingPower]} />
         <MetricCard label="核心公司" value={`${companies.length}`} />
       </section>
 
@@ -89,7 +94,7 @@ export const LayerPage = () => {
           <h2 className="text-xl font-semibold text-white">上下游关系图</h2>
           <p className="mt-2 text-sm text-slate-400">关系由统一关系数据自动推导。</p>
           <div className="mt-4">
-            <RelationshipGraph target={{ type: 'layer', id: layer.id }} dense />
+            <RelationshipGraph target={{ type: 'layer', id: layer.id }} dense showDemandPanel={false} />
           </div>
         </div>
         <MarketShareChart layer={layer} />
@@ -101,8 +106,10 @@ export const LayerPage = () => {
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {layer.coreTechnologies.map((tech) => (
               <div key={tech} className="rounded-lg border border-slate-700/35 bg-slate-950/35 p-3">
-                <p className="text-sm text-slate-100">{tech}</p>
-                <p className="mt-2 text-xs leading-5 text-slate-500">该能力节点用于演示本层技术组成。</p>
+                <p className="text-sm text-slate-100">{displayTerm(tech)}</p>
+                <p className="mt-2 text-xs leading-5 text-slate-500">
+                  {describeLayerTechnology(tech, layer.name.zh)}
+                </p>
               </div>
             ))}
           </div>
@@ -116,7 +123,7 @@ export const LayerPage = () => {
             </div>
             <div className="flex flex-wrap gap-2">
               {layer.chinaLandscape.keyBottlenecks.map((item) => (
-                <Badge key={item}>{item}</Badge>
+                <Badge key={item}>{displayTerm(item)}</Badge>
               ))}
             </div>
           </div>
@@ -134,8 +141,8 @@ export const LayerPage = () => {
               <div className="flex items-start gap-3">
                 <div className="grid h-12 w-12 place-items-center rounded-md bg-cyan-300/10 font-mono text-xs text-cyan-100">{company.logo}</div>
                 <div>
-                  <p className="font-semibold text-white">{company.name.en}</p>
-                  <p className="mt-1 text-sm text-slate-400">{company.basicInfo.country} · {companyTypeLabel[company.basicInfo.type]}</p>
+                  <p className="font-semibold text-white">{company.name.zh}</p>
+                  <p className="mt-1 text-sm text-slate-400">{displayCountry(company.basicInfo.country)} · {companyTypeLabel[company.basicInfo.type]}</p>
                 </div>
                 <ExternalLink className="ml-auto h-4 w-4 text-slate-500" />
               </div>
